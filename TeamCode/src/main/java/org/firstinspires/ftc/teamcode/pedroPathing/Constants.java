@@ -31,7 +31,7 @@ public class Constants {
             .strafePodX(0.5)
             //add this! offsets of the odonometry pods
             //.forwardPodY()
-            //.strafePodX(0
+            //.strafePodX()
             .distanceUnit(DistanceUnit.INCH)
             .hardwareMapName("pinpoint")
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
