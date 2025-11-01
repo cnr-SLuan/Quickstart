@@ -4,10 +4,11 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.mechanisms.workBench1;
+import org.firstinspires.ftc.teamcode.mechanisms.workBench;
 
 @TeleOp
 public class DCmotorPractice extends OpMode {
-    workBench1 bench = new workBench1();
+    workBench bench = new workBench();
 
     @Override
     public void init(){
@@ -16,6 +17,14 @@ public class DCmotorPractice extends OpMode {
 
     @Override
     public void loop(){
-        bench.setMotorSpeed(0.5);
+        double motorSpeed = gamepad1.right_stick_y;
+        bench.setMotorSpeed(motorSpeed);
+        if (bench.isTouchSensorPressed()){
+            bench.setMotorSpeed(0.5);
+        }
+        else{
+            bench.setMotorSpeed(0.0);//stops the motor
+        }
+        telemetry.addData("Motor Revs", bench.getMotorRevs());
     }
 }

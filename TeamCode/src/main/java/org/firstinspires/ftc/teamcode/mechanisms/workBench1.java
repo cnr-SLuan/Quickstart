@@ -6,9 +6,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class workBench1{
     private DcMotor motor; //linearSlideMotor0
-    private double ticksPerRev; //revolution
+    private double ticksPerRev; //aka ticks per revolution
     public void init(HardwareMap hwMap){
-        //
         motor = hwMap.get(DcMotor.class,"motor");
         motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         ticksPerRev = motor.getMotorType().getTicksPerRev();
