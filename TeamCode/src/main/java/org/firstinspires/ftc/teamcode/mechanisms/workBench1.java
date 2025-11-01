@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-public class valGamePad{
+public class workBench1{
     private DcMotor motor; //linearSlideMotor0
     private double ticksPerRev; //revolution
     public void init(HardwareMap hwMap){
