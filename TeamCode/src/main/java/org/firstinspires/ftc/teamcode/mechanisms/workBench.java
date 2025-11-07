@@ -40,4 +40,10 @@ public class workBench {
     public double getMotorRevs(){
         return motor.getCurrentPosition() / ticksPerRev; //normalizing ticks to revolution 2:1
     }
+    // -----------------------Game Pad Functions--------------------
+    public void setMotorZeroBehavior(DcMotor.ZeroPowerBehavior zeroBehavior){
+        motor.setZeroPowerBehavior(zeroBehavior);
+    }
+
+
 }
