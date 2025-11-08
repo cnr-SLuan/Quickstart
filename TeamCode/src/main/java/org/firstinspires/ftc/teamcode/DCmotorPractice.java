@@ -19,9 +19,10 @@ public class DCmotorPractice extends OpMode {
     @Override
     public void loop(){
         double motorSpeed = gamepad1.right_stick_y;
-        bench.setMotorSpeed(motorSpeed);
+        //bench.setMotorSpeed(motorSpeed);
+        bench.setMotorSpeed(0.6);
 
-        if (gamepad1.a){
+        /*if (gamepad1.a){
             bench.setMotorZeroBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         }
         else if (gamepad1.b){
@@ -34,6 +35,7 @@ public class DCmotorPractice extends OpMode {
         else{
             bench.setMotorSpeed(0.0);//stops the motor
         }
+         */
         telemetry.addData("Motor Revs", bench.getMotorRevs());
     }
 }
