@@ -16,5 +16,4 @@ public class frijoles extends OpMode{
     public void loop(){
 
     }
-    //https://www.w3schools.com/java/
 }
