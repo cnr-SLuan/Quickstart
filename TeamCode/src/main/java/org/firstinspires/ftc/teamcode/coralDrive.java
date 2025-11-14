@@ -4,8 +4,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-@TeleOp(name = "coral_drive (Blocks to Java)")
-public class coral_drive extends LinearOpMode {
+@TeleOp(name = "coralDrive (Blocks to Java)")
+public class coralDrive extends LinearOpMode {
 
     private DcMotor RL;
     private DcMotor RR;
@@ -30,6 +30,10 @@ public class coral_drive extends LinearOpMode {
         waitForStart();
         maxDrivePower = 1;
         RL.setDirection(DcMotor.Direction.REVERSE);
+        FL.setDirection(DcMotor.Direction.REVERSE);
+        FR.setDirection(DcMotor.Direction.REVERSE);
+        RR.setDirection(DcMotor.Direction.REVERSE);
+
         RL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         RR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         FL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -56,8 +60,9 @@ public class coral_drive extends LinearOpMode {
     private void gamepadDrive() {
         // ---------------------Game Pad Drive-------------------
         while (opModeIsActive()) {
-            horizontalInput = gamepad1.left_stick_x;
-            verticalInput = gamepad1.right_stick_y;
+
+            horizontalInput = -gamepad1.left_stick_x;
+            verticalInput = -gamepad1.right_stick_y;
             processDriveInputs();
             telemetry.update();
         }
