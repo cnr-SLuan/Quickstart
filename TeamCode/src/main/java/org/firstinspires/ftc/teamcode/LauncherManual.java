@@ -30,9 +30,11 @@ public class LauncherManual extends OpMode {
     @Override
     public void loop() {
         // X keypad
+        double degrees = 6000.0;
+        double rpm = (degrees/360)*60;//makes 1000 rpm
         if (gamepad1.x) {
             LN.setPower(1.0); // %100 speed
-            LN.setVelocity(6000.0, AngleUnit.DEGREES);
+            LN.setVelocity(rpm, AngleUnit.DEGREES);
 
             telemetry.addData("Status", "Running (Full Speed)");
         } else {
