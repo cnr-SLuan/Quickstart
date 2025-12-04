@@ -12,7 +12,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-
 @TeleOp(name = "AutonomousNo1")
 public class AutonomousNo1 extends OpMode{
 
@@ -94,6 +93,7 @@ public class AutonomousNo1 extends OpMode{
 
     private void autoRun() {
         robotReverse();
+
     }
 
     //@Override
