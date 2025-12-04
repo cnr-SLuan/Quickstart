@@ -9,12 +9,35 @@ import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+
+
+@TeleOp(name = "AutonomousNo1")
 public class AutonomousNo1 extends OpMode{
+
+    private DcMotor RL;
+    private DcMotor RR;
+    private DcMotor FL;
+    private DcMotor FR;
+
+    int maxDrivePower;
+    float horizontalInput;
+    float verticalInput;
     private Limelight3A limelight;
     private IMU imu;
 
-    @Override
+    //@Override
     public void init() {
+        autoInit();
+        start();
+        loop();
+
+
+    }
+
+    //@Override
+    private void autoInit() {
         limelight = hardwareMap.get(Limelight3A.class, "Limelight");
         limelight.pipelineSwitch(21); //april tag
         imu = hardwareMap.get(IMU.class, "imu");
@@ -39,6 +62,71 @@ public class AutonomousNo1 extends OpMode{
             telemetry.addData("Ty", llResult.getTy());
             telemetry.addData("Ta", llResult.getTa());
         }
-        
+
+    }
+
+    private void robotReverse() {
+        FL.setPower(-1.0);
+        RL.setPower(-1.0);
+        FR.setPower(-1.0);
+        RR.setPower(-1.0);
+    }
+    private void robotForward() {
+        FL.setPower(1.0);
+        RL.setPower(1.0);
+        FR.setPower(1.0);
+        RR.setPower(1.0);
+    }
+
+    private void robotRight() {
+        FL.setPower(1.0);
+        RL.setPower(1.0);
+        FR.setPower(-1.0);
+        RR.setPower(-1.0);
+    }
+
+    private void robotLeft() {
+        FL.setPower(-1.0);
+        RL.setPower(-1.0);
+        FR.setPower(1.0);
+        RR.setPower(1.0);
+    }
+
+    private void autoRun() {
+        robotReverse();
+    }
+
+    //@Override
+    private void gamepadInit() {
+        RL = hardwareMap.get(DcMotor.class, "RL");
+        RR = hardwareMap.get(DcMotor.class, "RR");
+        FL = hardwareMap.get(DcMotor.class, "FL");
+        FR = hardwareMap.get(DcMotor.class, "FR");
+
+        maxDrivePower = 1;
+        RL.setDirection(DcMotor.Direction.REVERSE);
+        FL.setDirection(DcMotor.Direction.REVERSE);
+
+        RL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        RR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        FL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        FR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        gamepadDrive();
+    }
+    private void processDriveInputs() {
+        // -------------------Process Drive Inputs----------------
+        FL.setPower(verticalInput * maxDrivePower + horizontalInput * maxDrivePower);
+        RL.setPower(verticalInput * maxDrivePower + horizontalInput * maxDrivePower);
+        FR.setPower(verticalInput * maxDrivePower - horizontalInput * maxDrivePower);
+        RR.setPower(verticalInput * maxDrivePower - horizontalInput * maxDrivePower);
+    }
+
+    private void gamepadDrive() {
+    // ---------------------Game Pad Drive-----------------
+        horizontalInput = -gamepad1.left_stick_x;
+        verticalInput = gamepad1.right_stick_y;
+        processDriveInputs();
+        telemetry.update();
+
     }
 }
