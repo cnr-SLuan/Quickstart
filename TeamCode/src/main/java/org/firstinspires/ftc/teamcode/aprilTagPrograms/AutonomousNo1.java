@@ -11,6 +11,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name = "AutonomousNo1")
 public class AutonomousNo1 extends OpMode{
@@ -26,6 +27,8 @@ public class AutonomousNo1 extends OpMode{
     private Limelight3A limelight;
     private IMU imu;
 
+    private static ElapsedTime myTimer = new ElapsedTime();
+
     //@Override
     public void init() {
         autoInit();
@@ -38,7 +41,9 @@ public class AutonomousNo1 extends OpMode{
     //@Override
     private void autoInit() {
         limelight = hardwareMap.get(Limelight3A.class, "Limelight");
-        limelight.pipelineSwitch(21); //april tag
+        limelight.pipelineSwitch(22); //april tag
+        limelight.pipelineSwitch(24);
+        limelight.pipelineSwitch(21);
         imu = hardwareMap.get(IMU.class, "imu");
         RevHubOrientationOnRobot revHubOrientationOnRobot = new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP,
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD);
@@ -90,9 +95,24 @@ public class AutonomousNo1 extends OpMode{
         FR.setPower(1.0);
         RR.setPower(1.0);
     }
-
+    @Override
+    public void stop(){
+        FL.setPower(0.0);
+        RL.setPower(0.0);
+        FR.setPower(0.0);
+        RR.setPower(0.0);
+    }
     private void autoRun() {
         robotReverse();
+        while (myTimer.time() < 5){
+            telemetry.addData("Time", "%.2f", myTimer.time());
+            telemetry.update();
+        }
+        stop();
+        LLResult llResult = limelight.getLatestResult();
+        if (llResult != null && llResult.isValid()) {
+            telemetry.addData("April Tag: ", llResult.getPipelineIndex());
+        }
 
     }
 
