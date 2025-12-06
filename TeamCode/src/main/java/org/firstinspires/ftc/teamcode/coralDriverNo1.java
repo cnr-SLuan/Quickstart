@@ -195,7 +195,7 @@
                     LN.setPower(1); // %100 speed
                     LN.setVelocity(rpm, AngleUnit.DEGREES);
                     LS.setPosition(1.0);
-                    RS.setPosition(1.0);
+                    RS.setPosition(-1.0);
                     telemetry.addData("Status", "Running (Full Speed)");
                 } else {
                     INTAKE.setPower(0.0);
