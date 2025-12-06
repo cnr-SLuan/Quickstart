@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 //import to drive robot
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -10,9 +11,17 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
+
+//import to run servos
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+
 @TeleOp(name = "coralDriverNo1 (Blocks to Java)")
 public class coralDriverNo1 extends LinearOpMode {
-    private DcMotorEx LN;
+    private CRServo LS; //left servo
+    private CRServo RS; //right servo
+    private DcMotorEx INT; //intake
+    private DcMotorEx LN; //launcher
     private DcMotor RL;
     private DcMotor RR;
     private DcMotor FL;
@@ -26,9 +35,13 @@ public class coralDriverNo1 extends LinearOpMode {
      * Initializes the program; sets the max drive power to 1, sets
      * the left motors to reverse, calls the gamepad drive function
      */
+    //----------------RUNS OPMODE---------------
     @Override
     public void runOpMode() {
         launcherPrep();
+        servoPrep();
+        intakePrep();
+        telemetry.update();
         RL = hardwareMap.get(DcMotor.class, "RL");
         RR = hardwareMap.get(DcMotor.class, "RR");
         FL = hardwareMap.get(DcMotor.class, "FL");
@@ -43,9 +56,30 @@ public class coralDriverNo1 extends LinearOpMode {
         FL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         FR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         gamepadDrive();
+        myLoop();
     }
-    
-
+    //Calls all functions
+    private void myLoop(){
+        while (opModeIsActive()){
+            gamepadDrive();
+            if (gamepad1.a){
+                intakeArtifacts();
+            }
+            if (gamepad1.x){
+                launchArtifact();
+            }
+        }
+    }
+    //-----------------------SERVOS-------------------------
+    private void servoPrep() {
+        LS = hardwareMap.get(CRServo.class, "LS");
+        RS = hardwareMap.get(CRServo.class, "RS");
+        LS.setPower(0.0);
+        LS.setDirection(CRServo.Direction.REVERSE);
+        RS.setPower(0.0);
+        telemetry.addData("Servos Status", "Ready");
+    }
+    //-------------------FLYWHEEL-----------------------------
     private void launcherPrep() {
         // Motor hardwareMapname : LN)
         LN = hardwareMap.get(DcMotorEx.class, "LN");
@@ -53,15 +87,23 @@ public class coralDriverNo1 extends LinearOpMode {
         // Encoderless
         LN.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         LN.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        telemetry.addData("status:", "Ready 67 ");
+        telemetry.addData("Launcher Status:", "Ready");
         LN.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        telemetry.update();
+    }
+    //---------------------INTAKE--------------------------------
+    private void intakePrep() {
+        // Motor hardwareMapname : INT)
+        INT = hardwareMap.get(DcMotorEx.class, "INT");
+        // Encoderless
+        LN.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        LN.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        telemetry.addData("Intake Status:", "Ready");
+        LN.setDirection(DcMotorSimple.Direction.REVERSE);
     }
     /**
      * Sets the speed power for the motors when vertical and/or horizontal input is received
      */
+    //----------------------DRIVER----------------------------
     private void processDriveInputs() {
         // -------------------Process Drive Inputs----------------
         FL.setPower(verticalInput * maxDrivePower + horizontalInput * maxDrivePower);
@@ -77,11 +119,43 @@ public class coralDriverNo1 extends LinearOpMode {
      */
     private void gamepadDrive() {
         // ---------------------Game Pad Drive-------------------
-        while (opModeIsActive()) {
-            horizontalInput = gamepad1.left_stick_x;
-            verticalInput = -gamepad1.right_stick_y;
-            processDriveInputs();
-            telemetry.update();
+        horizontalInput = gamepad1.left_stick_x;
+        verticalInput = -gamepad1.right_stick_y;
+        processDriveInputs();
+        telemetry.update();
+
+    }
+    //-----------------------LAUNCH FUNCTION-----------------------
+    private void launchArtifact() {
+        double degrees = 6000.0;
+        double rpm = (degrees/360)*60;//makes 1000 rpm
+        // X keypad
+        if (gamepad1.x) {
+            //LN.setPower(1); // %100 speed
+            LN.setVelocity(rpm, AngleUnit.DEGREES);
+            LS.setPower(1.0);
+            RS.setPower(1.0);
+            telemetry.addData("Status", "Running (Full Speed)");
+        } else {
+            LN.setPower(0.0);
+            LS.setPower(0.0);
+            RS.setPower(0.0);
+            telemetry.addData("Status", "Stopped");
+        }
+        telemetry.update();
+    }
+    //----------------------INTAKE FUNCTION-------------------------
+    private void intakeArtifacts(){
+        double degrees = 6000.0;
+        double rpm = (degrees/360)*60;//makes 1000 rpm
+        if (gamepad1.a){
+            INT.setVelocity(rpm, AngleUnit.DEGREES);
+            telemetry.addData("Status", "Running (Full Speed)");
+        }
+        else{
+            INT.setPower(0.0);
+            telemetry.addData("Status", "Stopped");
         }
     }
+
 }
