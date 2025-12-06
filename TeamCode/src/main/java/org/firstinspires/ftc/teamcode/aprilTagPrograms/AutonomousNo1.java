@@ -41,9 +41,8 @@ public class AutonomousNo1 extends OpMode{
     //@Override
     private void autoInit() {
         limelight = hardwareMap.get(Limelight3A.class, "Limelight");
-        limelight.pipelineSwitch(22); //april tag
-        limelight.pipelineSwitch(24);
-        limelight.pipelineSwitch(21);
+        //set the pipeline index to 8
+        limelight.pipelineSwitch(8); //pipeline index setting
         imu = hardwareMap.get(IMU.class, "imu");
         RevHubOrientationOnRobot revHubOrientationOnRobot = new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP,
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD);
@@ -112,8 +111,10 @@ public class AutonomousNo1 extends OpMode{
         LLResult llResult = limelight.getLatestResult();
         if (llResult != null && llResult.isValid()) {
             telemetry.addData("April Tag: ", llResult.getPipelineIndex());
-        }
+            if (llResult.getPipelineIndex() == 24){
 
+            }
+        }
     }
 
     //@Override

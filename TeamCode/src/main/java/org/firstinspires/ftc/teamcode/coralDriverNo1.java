@@ -1,12 +1,18 @@
 package org.firstinspires.ftc.teamcode;
 
+//import to drive robot
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-@TeleOp(name = "coralDrive (Blocks to Java)")
-public class coralDrive extends LinearOpMode {
+//import to run flywheel
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotor;
+@TeleOp(name = "coralDriverNo1 (Blocks to Java)")
+public class coralDriverNo1 extends LinearOpMode {
+    private DcMotorEx LN;
     private DcMotor RL;
     private DcMotor RR;
     private DcMotor FL;
@@ -22,6 +28,7 @@ public class coralDrive extends LinearOpMode {
      */
     @Override
     public void runOpMode() {
+        launcherPrep();
         RL = hardwareMap.get(DcMotor.class, "RL");
         RR = hardwareMap.get(DcMotor.class, "RR");
         FL = hardwareMap.get(DcMotor.class, "FL");
@@ -29,10 +36,7 @@ public class coralDrive extends LinearOpMode {
 
         waitForStart();
         maxDrivePower = 1;
-        RL.setDirection(DcMotor.Direction.REVERSE);
         FL.setDirection(DcMotor.Direction.REVERSE);
-        FR.setDirection(DcMotor.Direction.REVERSE);
-        RR.setDirection(DcMotor.Direction.REVERSE);
 
         RL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         RR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -40,11 +44,24 @@ public class coralDrive extends LinearOpMode {
         FR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         gamepadDrive();
     }
+    
 
+    private void launcherPrep() {
+        // Motor hardwareMapname : LN)
+        LN = hardwareMap.get(DcMotorEx.class, "LN");
+
+        // Encoderless
+        LN.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        LN.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        telemetry.addData("status:", "Ready 67 ");
+        LN.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        telemetry.update();
+    }
     /**
      * Sets the speed power for the motors when vertical and/or horizontal input is received
      */
-
     private void processDriveInputs() {
         // -------------------Process Drive Inputs----------------
         FL.setPower(verticalInput * maxDrivePower + horizontalInput * maxDrivePower);
@@ -61,8 +78,7 @@ public class coralDrive extends LinearOpMode {
     private void gamepadDrive() {
         // ---------------------Game Pad Drive-------------------
         while (opModeIsActive()) {
-
-            horizontalInput = -gamepad1.left_stick_x;
+            horizontalInput = gamepad1.left_stick_x;
             verticalInput = -gamepad1.right_stick_y;
             processDriveInputs();
             telemetry.update();
