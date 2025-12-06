@@ -56,7 +56,7 @@ public class coralDriverNo1 extends LinearOpMode {
         FL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         FR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         gamepadDrive();
-        myLoop();
+        pilot();
     }
     //Calls all functions
     private void myLoop(){
@@ -157,5 +157,34 @@ public class coralDriverNo1 extends LinearOpMode {
             telemetry.addData("Status", "Stopped");
         }
     }
+    private void pilot(){
+        while (opModeIsActive()){
+            horizontalInput = gamepad1.left_stick_x;
+            verticalInput = -gamepad1.right_stick_y;
+            processDriveInputs();
+            telemetry.update();
 
+            double degrees = 6000.0;
+            double rpm = (degrees/360)*60;//makes 1000 rpm
+            if (gamepad1.a){
+                INT.setVelocity(rpm, AngleUnit.DEGREES);
+                telemetry.addData("Status", "Running (Full Speed)");
+            }
+            if (gamepad1.x) {
+                //LN.setPower(1); // %100 speed
+                LN.setVelocity(rpm, AngleUnit.DEGREES);
+                LS.setPower(1.0);
+                RS.setPower(1.0);
+                telemetry.addData("Status", "Running (Full Speed)");
+            }
+            else{
+                INT.setPower(0.0);
+
+                LN.setPower(0.0);
+                LS.setPower(0.0);
+                RS.setPower(0.0);
+                telemetry.addData("Status", "Stopped");
+            }
+        }
+    }
 }
