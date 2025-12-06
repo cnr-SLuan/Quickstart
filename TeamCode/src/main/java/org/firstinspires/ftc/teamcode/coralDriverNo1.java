@@ -2,7 +2,7 @@
 
     //import to drive robot
     import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-    import com.qualcomm.robotcore.hardware.CRServo;
+    import com.qualcomm.robotcore.hardware.Servo;
     import com.qualcomm.robotcore.eventloop.opmode.OpMode;
     import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
     import com.qualcomm.robotcore.hardware.DcMotor;
@@ -19,8 +19,8 @@
 
     @TeleOp(name = "coralDriverNo1 (Blocks to Java)")
     public class coralDriverNo1 extends LinearOpMode {
-        //   private CRServo LS; //left servo
-        //   private CRServo RS; //right servo
+        private Servo LS; //left servo
+        private Servo RS; //right servo
         private DcMotorEx INTAKE; //intake
         private DcMotorEx LN; //launcher
         private DcMotor RL;
@@ -31,7 +31,14 @@
         int maxDrivePower;
         float horizontalInput;
         float verticalInput;
-
+        /** CONTROLS
+         * Left stick y goes forwards and backwards
+         * Left stick x strafts
+         * right stick x turns
+         * x button on gamepad activates servos and launcher
+         * a button activates intake
+         * lift your finger off either button to stop the motors
+         */
         /**
          * Initializes the program; sets the max drive power to 1, sets
          * the left motors to reverse, calls the gamepad drive function
@@ -40,7 +47,7 @@
         @Override
         public void runOpMode() {
             launcherPrep();
-            //servoPrep();
+            servoPrep();
             intakePrep();
             telemetry.update();
             RL = hardwareMap.get(DcMotor.class, "RL");
@@ -60,7 +67,6 @@
             gamepadDrive();
             pilot();
         }
-
         //Calls all functions
         private void myLoop() {
             while (opModeIsActive()) {
@@ -75,14 +81,12 @@
         }
 
         //-----------------------SERVOS-------------------------
-        /*private void servoPrep() {
-            LS = hardwareMap.get(CRServo.class, "LS");
-            RS = hardwareMap.get(CRServo.class, "RS");
-            LS.setPower(0.0);
-            LS.setDirection(CRServo.Direction.REVERSE);
-            RS.setPower(0.0);
+        private void servoPrep() {
+            LS = hardwareMap.get(Servo.class, "LS");
+            RS = hardwareMap.get(Servo.class, "RS");
             telemetry.addData("Servos Status", "Ready");
-        }*/
+        }
+
         //-------------------FLYWHEEL-----------------------------
         private void launcherPrep() {
             // Motor hardwareMapname : LN)
@@ -147,15 +151,15 @@
             double rpm = (degrees / 360) * 60;//makes 1000 rpm
             // X keypad
             if (gamepad1.x) {
-                //LN.setPower(1); // %100 speed
+                LN.setPower(1); // %100 speed
                 LN.setVelocity(rpm, AngleUnit.DEGREES);
-                //LS.setPower(1.0);
-                //RS.setPower(1.0);
+                LS.setPosition(1.0);
+                RS.setPosition(-1.0);
                 telemetry.addData("Status", "Running (Full Speed)");
             } else {
                 LN.setPower(0.0);
-                //LS.setPower(0.0);
-                //RS.setPower(0.0);
+                LS.setPosition(0.0);
+                RS.setPosition(0.0);
                 telemetry.addData("Status", "Stopped");
             }
             telemetry.update();
@@ -188,17 +192,17 @@
                     telemetry.addData("Status", "Running (Full Speed)");
                 }
                 if (gamepad1.x) {
-                    //LN.setPower(1); // %100 speed
+                    LN.setPower(1); // %100 speed
                     LN.setVelocity(rpm, AngleUnit.DEGREES);
-                    //LS.setPower(1.0);
-                    //RS.setPower(1.0);
+                    LS.setPosition(1.0);
+                    RS.setPosition(1.0);
                     telemetry.addData("Status", "Running (Full Speed)");
                 } else {
                     INTAKE.setPower(0.0);
 
                     LN.setPower(0.0);
-                    //LS.setPower(0.0);
-                    // RS.setPower(0.0);
+                    LS.setPosition(0.0);
+                    RS.setPosition(0.0);
                     telemetry.addData("Status", "Stopped");
                 }
             }
