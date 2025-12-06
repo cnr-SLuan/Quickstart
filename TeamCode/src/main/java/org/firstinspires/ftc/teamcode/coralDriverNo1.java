@@ -28,6 +28,9 @@
         private DcMotor FL;
         private DcMotor FR;
 
+        double myPosL;
+        double myPosR;
+
         int maxDrivePower;
         float horizontalInput;
         float verticalInput;
@@ -98,7 +101,6 @@
             telemetry.addData("Launcher Status:", "Ready");
             LN.setDirection(DcMotorSimple.Direction.REVERSE);
         }
-
         //---------------------INTAKE--------------------------------
         private void intakePrep() {
             // Motor hardwareMapname : INT)
@@ -194,15 +196,17 @@
                 if (gamepad1.x) {
                     LN.setPower(1); // %100 speed
                     LN.setVelocity(rpm, AngleUnit.DEGREES);
-                    LS.setPosition(1.0);
-                    RS.setPosition(-1.0);
+                    myPosL = 1.0;
+                    myPosR = 1.0;
+                    LS.setPosition(myPosL);
+                    RS.setPosition(myPosR);
                     telemetry.addData("Status", "Running (Full Speed)");
                 } else {
                     INTAKE.setPower(0.0);
 
                     LN.setPower(0.0);
-                    LS.setPosition(0.0);
-                    RS.setPosition(0.0);
+                    LS.setPosition(myPosL);
+                    RS.setPosition(myPosR);
                     telemetry.addData("Status", "Stopped");
                 }
             }

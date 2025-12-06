@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.aprilTagPrograms;
 
+import static java.lang.Thread.sleep;
+
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
@@ -94,8 +96,7 @@ public class AutonomousNo1 extends OpMode{
         FR.setPower(1.0);
         RR.setPower(1.0);
     }
-    @Override
-    public void stop(){
+    private void robotStop(){
         FL.setPower(0.0);
         RL.setPower(0.0);
         FR.setPower(0.0);
@@ -103,10 +104,7 @@ public class AutonomousNo1 extends OpMode{
     }
     private void autoRun() {
         robotReverse();
-        while (myTimer.time() < 5){
-            telemetry.addData("Time", "%.2f", myTimer.time());
-            telemetry.update();
-        }
+        sleep(1200);
         stop();
         LLResult llResult = limelight.getLatestResult();
         if (llResult != null && llResult.isValid()) {
@@ -116,7 +114,25 @@ public class AutonomousNo1 extends OpMode{
             }
         }
     }
-
+    private void teamRed(){
+        robotLeft();
+        while (myTimer.time() < 0.02){
+            telemetry.addData("Time", "%.2f", myTimer.time());
+            telemetry.update();
+            if (myTimer.time() == 0.02){
+                break;
+            }
+        }
+        robotReverse();
+        while (myTimer.time() < 0.15) {
+            telemetry.addData("Time", "%.2f", myTimer.time());
+            telemetry.update();
+            if (myTimer.time() == 0.15) {
+                break;
+            }
+        }
+        robotStop();
+    }
     //@Override
     private void gamepadInit() {
         RL = hardwareMap.get(DcMotor.class, "RL");
