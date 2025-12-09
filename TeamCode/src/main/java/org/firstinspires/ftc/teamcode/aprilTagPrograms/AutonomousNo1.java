@@ -104,7 +104,6 @@ public class AutonomousNo1 extends OpMode{
     }
     private void autoRun() {
         robotReverse();
-        sleep(1200);
         stop();
         LLResult llResult = limelight.getLatestResult();
         if (llResult != null && llResult.isValid()) {
