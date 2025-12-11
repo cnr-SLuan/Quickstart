@@ -10,6 +10,13 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
+/**
+ * December 2025
+ * Valeria's code by the way, do not mess with please.
+ * this code is so I can mess with it and don't alter MyTest, which actually works.
+ * NEVER USE THIS FOR COMPETITIONS.
+ */
+
 @TeleOp(name = "myOwnTest")
 public class myOwnTest extends LinearOpMode {
 
@@ -73,9 +80,10 @@ public class myOwnTest extends LinearOpMode {
         while (opModeIsActive()) {
 
             // --- DRIVE CONTROLS ---
+            //EDIT NO.4: turn is on left joystick and stafe is on right joystick
             double y = -gamepad1.left_stick_y;
-            double x = gamepad1.left_stick_x * 1.1; //EDIT NO.2: x is meant to be strafing, and r is rotation
-            double r = gamepad1.right_stick_x;
+            double r = gamepad1.left_stick_x*0.2; //EDIT NO.2: x is meant to be strafing, and r is rotation
+            double x = gamepad1.right_stick_x*1.1;
 
             /*
             EDIT NO.3: normalizes the power values by creating four new variables instead of
