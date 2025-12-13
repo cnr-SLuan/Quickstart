@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -8,7 +9,22 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+
+//imports for apriltags
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.VisionPortalImpl;
+import org.firstinspires.ftc.vision.VisionProcessor;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagLibrary;
+import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
+import org.firstinspires.ftc.vision.apriltag.AprilTagPoseRaw;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessorImpl;
+
+import java.util.List;
 
 /**
  * December 2025
@@ -24,11 +40,39 @@ public class myOwnTest extends LinearOpMode {
     private DcMotorEx INTAKE, LN;
     private DcMotor RL, RR, FL, FR;
 
+    private AprilTagProcessor.Builder myAprilTagProcessorBuilder;
+    private AprilTagProcessor myAprilTagProcessor;
+     private VisionPortal.Builder myVisionPortalBuilder;
+     private VisionPortal myVisionPortal;
+    private Limelight3A limelight;
+
+    private List<AprilTagDetection> myAprilTagDetections;
+
+    private AprilTagDetection myAprilTagDetection;
     double servoPower = 0.0;
 
+    private void initVisionPortal() {
+        myVisionPortalBuilder = new VisionPortal.Builder();
+        myVisionPortal = (myVisionPortalBuilder.build());
+        limelight = hardwareMap.get(Limelight3A.class, "Limelight");
+        myVisionPortalBuilder.setCamera((CameraName) limelight);
+        myAprilTagProcessorBuilder = new AprilTagProcessor.Builder();
+        myAprilTagProcessor = (myAprilTagProcessorBuilder.build());
+        myVisionPortalBuilder.addProcessor(myAprilTagProcessor);
+
+    }
     @Override
     public void runOpMode() {
-
+        //--APRIL TAG FUNCTION
+        initVisionPortal();
+        myAprilTagDetections = (myAprilTagProcessor.getDetections());
+        for (AprilTagDetection myAprilTagDetection2 : myAprilTagDetections) {
+            myAprilTagDetection = myAprilTagDetection2;
+            telemetry.addData("ID", (myAprilTagDetection.id));
+            telemetry.addData("Range", (myAprilTagDetection.ftcPose.range));
+            telemetry.addData("Yaw", (myAprilTagDetection.ftcPose.yaw));
+        }
+        telemetry.update();
         // --- DRIVE MOTORS ---
         RL = hardwareMap.get(DcMotor.class, "RL");
         RR = hardwareMap.get(DcMotor.class, "RR");
