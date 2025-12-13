@@ -45,7 +45,6 @@ public class processor extends OpMode {
             telemetry.addData("Tx", llResult.getTx());
             telemetry.addData("Ty", llResult.getTy());
             telemetry.addData("Ta", llResult.getTa());
-            telemetry.addData("Distance", llResult.getBotposeAvgDist());
             List<LLResultTypes.FiducialResult> fiducials = llResult.getFiducialResults();
             if (fiducials.isEmpty()) {
                 telemetry.addLine("No AprilTags");
