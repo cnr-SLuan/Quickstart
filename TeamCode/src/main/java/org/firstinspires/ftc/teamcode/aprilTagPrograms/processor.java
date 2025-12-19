@@ -2,13 +2,13 @@ package org.firstinspires.ftc.teamcode.aprilTagPrograms;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
-import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.IMU;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
@@ -18,7 +18,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 public class processor extends OpMode {
     private Limelight3A limelight;
     private IMU imu;
-    private LLResultTypes.BarcodeResult BarcodeResult;
+    LLResult llResult;
 
     @Override
     public void init() {
@@ -39,7 +39,7 @@ public class processor extends OpMode {
     public void loop() {
         YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
         limelight.updateRobotOrientation(orientation.getYaw());
-        LLResult llResult = limelight.getLatestResult();
+        llResult = limelight.getLatestResult();
         if (llResult != null && llResult.isValid()) {
             Pose3D botPose = llResult.getBotpose_MT2();
             telemetry.addData("Tx", llResult.getTx());
@@ -66,6 +66,23 @@ public class processor extends OpMode {
             }
 
         }
+    }
+    private void redTeam(){
+        LinkedList<LinkedList<Double>> myStats = new LinkedList<>();
+        LinkedList<Double> miniStats = new LinkedList<Double>();
+        if (gamepad1.dpadUpWasPressed()){
+            miniStats.add(llResult.getTx());
+            miniStats.add(llResult.getTy());
+            miniStats.add(llResult.getTa());
+            myStats.add(miniStats);
+            while (!miniStats.isEmpty()){
+                miniStats.removeLast();
+            }
+        }
+        else{
+            telemetry.addLine("Nothing for now.");
+        }
+
     }
 
 }
