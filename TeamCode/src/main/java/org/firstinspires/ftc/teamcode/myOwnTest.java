@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.hardware.limelightvision.Limelight3A;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -9,22 +9,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.CameraName;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
-//imports for apriltags
-import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.VisionPortalImpl;
-import org.firstinspires.ftc.vision.VisionProcessor;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-import org.firstinspires.ftc.vision.apriltag.AprilTagLibrary;
-import org.firstinspires.ftc.vision.apriltag.AprilTagPoseFtc;
-import org.firstinspires.ftc.vision.apriltag.AprilTagPoseRaw;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessorImpl;
 
-import java.util.List;
 
 /**
  * December 2025
@@ -36,81 +23,53 @@ import java.util.List;
 @TeleOp(name = "myOwnTest")
 public class myOwnTest extends LinearOpMode {
 
-    private CRServo SR1, SR2;
-    private DcMotorEx INTAKE, LN;
-    private DcMotor RL, RR, FL, FR;
+    private CRServo intakeServoLeft, intakeServoRight;
+    private DcMotorEx intakeMotor, flywheelMotor;
+    private DcMotor backLeft, backRight, frontLeft, frontRight;
 
-    private AprilTagProcessor.Builder myAprilTagProcessorBuilder;
-    private AprilTagProcessor myAprilTagProcessor;
-     private VisionPortal.Builder myVisionPortalBuilder;
-     private VisionPortal myVisionPortal;
-    private Limelight3A limelight;
-
-    private List<AprilTagDetection> myAprilTagDetections;
-
-    private AprilTagDetection myAprilTagDetection;
     double servoPower = 0.0;
 
-    private void initVisionPortal() {
-        myVisionPortalBuilder = new VisionPortal.Builder();
-        myVisionPortal = (myVisionPortalBuilder.build());
-        limelight = hardwareMap.get(Limelight3A.class, "Limelight");
-        myVisionPortalBuilder.setCamera((CameraName) limelight);
-        myAprilTagProcessorBuilder = new AprilTagProcessor.Builder();
-        myAprilTagProcessor = (myAprilTagProcessorBuilder.build());
-        myVisionPortalBuilder.addProcessor(myAprilTagProcessor);
 
-    }
     @Override
     public void runOpMode() {
-        //--APRIL TAG FUNCTION
-        initVisionPortal();
-        myAprilTagDetections = (myAprilTagProcessor.getDetections());
-        for (AprilTagDetection myAprilTagDetection2 : myAprilTagDetections) {
-            myAprilTagDetection = myAprilTagDetection2;
-            telemetry.addData("ID", (myAprilTagDetection.id));
-            telemetry.addData("Range", (myAprilTagDetection.ftcPose.range));
-            telemetry.addData("Yaw", (myAprilTagDetection.ftcPose.yaw));
-        }
-        telemetry.update();
         // --- DRIVE MOTORS ---
-        RL = hardwareMap.get(DcMotor.class, "RL");
-        RR = hardwareMap.get(DcMotor.class, "RR");
-        FL = hardwareMap.get(DcMotor.class, "FL");
-        FR = hardwareMap.get(DcMotor.class, "FR");
+        backLeft = hardwareMap.get(DcMotor.class, "backLeft");
+        backRight = hardwareMap.get(DcMotor.class, "backRight");
+        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
+        frontRight = hardwareMap.get(DcMotor.class, "FR");
 
-        FL.setDirection(DcMotor.Direction.REVERSE);
-        RL.setDirection(DcMotor.Direction.REVERSE);
+        frontLeft.setDirection(DcMotor.Direction.REVERSE);
+        backLeft.setDirection(DcMotor.Direction.REVERSE);
 
         /*
         EDIT NO.1: set the right wheels to forward explicitly so the directions are corrected
          */
-        FR.setDirection(DcMotor.Direction.FORWARD);
-        RR.setDirection(DcMotor.Direction.FORWARD);
+        frontRight.setDirection(DcMotor.Direction.FORWARD);
+        backRight.setDirection(DcMotor.Direction.FORWARD);
 
-        RL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        RR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        FL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        FR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // --- LAUNCHER MOTOR ---
-        LN = hardwareMap.get(DcMotorEx.class, "LN");
-        LN.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        LN.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        LN.setDirection(DcMotorSimple.Direction.FORWARD);
+        flywheelMotor = hardwareMap.get(DcMotorEx.class, "flywheelMotor");
+        flywheelMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        flywheelMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        flywheelMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
         // --- INTAKE MOTOR ---
-        INTAKE = hardwareMap.get(DcMotorEx.class, "INTAKE");
-        INTAKE.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        INTAKE.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        INTAKE.setDirection(DcMotorSimple.Direction.FORWARD);
+        intakeMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
+        intakeMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        intakeMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
         // --- CR SERVOS ---
-        SR1 = hardwareMap.get(CRServo.class, "SR1");
-        SR2 = hardwareMap.get(CRServo.class, "SR2");
+        intakeServoLeft = hardwareMap.get(CRServo.class, "intakeServoLeft");
+        intakeServoRight = hardwareMap.get(CRServo.class, "intakeServoRight");
 
-        SR1.setDirection(CRServo.Direction.FORWARD);
-        SR2.setDirection(CRServo.Direction.FORWARD);
+        intakeServoLeft.setDirection(CRServo.Direction.FORWARD);
+        intakeServoRight.setDirection(CRServo.Direction.FORWARD);
 
         // Neutral position
         //SR1.setPower(0.5);
@@ -146,24 +105,24 @@ public class myOwnTest extends LinearOpMode {
                             Math.max(Math.abs(fr),
                                     Math.max(Math.abs(rl), Math.abs(rr)))));
 
-            FL.setPower(fl / max);
-            FR.setPower(fr / max);
-            RL.setPower(rl / max);
-            RR.setPower(rr / max);
+            frontLeft.setPower(fl / max);
+            frontRight.setPower(fr / max);
+            backLeft.setPower(rl / max);
+            backRight.setPower(rr / max);
 
             // --- INTAKE ---
             double rpm = (6000.0 / 360.0) * 60.0;
             if (gamepad1.a) {
-                INTAKE.setVelocity(rpm, AngleUnit.DEGREES);
+                intakeMotor.setVelocity(rpm, AngleUnit.DEGREES);
             } else {
-                INTAKE.setPower(0);
+                intakeMotor.setPower(0);
             }
 
             // --- LAUNCHER ---
             if (gamepad1.x) {
-                LN.setPower(0.7);
+                flywheelMotor.setPower(0.7);
             } else {
-                LN.setPower(0);
+                flywheelMotor.setPower(0);
             }
 
             // --- CR SERVOS (manual control) ---
@@ -174,26 +133,26 @@ public class myOwnTest extends LinearOpMode {
             if (gamepad1.left_bumper) {
                 // Forward
                 servoPower = 1.0;
-                SR1.setPower(servoPower);
-                SR2.setPower(servoPower);
+                intakeServoLeft.setPower(servoPower);
+                intakeServoRight.setPower(servoPower);
             }
             else if (gamepad1.right_bumper) {
                 // Reverse
                 servoPower = -1.0;
-                SR1.setPower(servoPower);
-                SR2.setPower(servoPower);
+                intakeServoLeft.setPower(servoPower);
+                intakeServoRight.setPower(servoPower);
             }
             else {
                 // No bumper → stop
-                SR1.setPower(0.0);
-                SR2.setPower(0.0);
+                intakeServoLeft.setPower(0.0);
+                intakeServoRight.setPower(0.0);
             }
             // Apply power
 
 
             // --- Telemetry ---
-            telemetry.addData("SR1 Power", SR1.getPower());
-            telemetry.addData("SR2 Power", SR2.getPower());
+            telemetry.addData("intakeServoLeft Power", intakeServoLeft.getPower());
+            telemetry.addData("intakeServoRight Power", intakeServoRight.getPower());
             telemetry.update();
         }
     }
