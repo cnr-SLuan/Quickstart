@@ -8,8 +8,9 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.IMU;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Collections;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
@@ -19,6 +20,10 @@ public class processor extends OpMode {
     private Limelight3A limelight;
     private IMU imu;
     LLResult llResult;
+
+    double min;
+    double max;
+    int temp;
 
     @Override
     public void init() {
@@ -68,15 +73,19 @@ public class processor extends OpMode {
         }
     }
     private void redTeam(){
-        LinkedList<LinkedList<Double>> myStats = new LinkedList<>();
-        LinkedList<Double> miniStats = new LinkedList<Double>();
+        ArrayList<ArrayList<Double>> myStats = new ArrayList<>();
+        ArrayList<Double> miniStats = new ArrayList<Double>();
         if (gamepad1.dpadUpWasPressed()){
             miniStats.add(llResult.getTx());
             miniStats.add(llResult.getTy());
             miniStats.add(llResult.getTa());
             myStats.add(miniStats);
             while (!miniStats.isEmpty()){
-                miniStats.removeLast();
+                Collections.sort(miniStats);
+                min = miniStats.get(0);
+                temp = miniStats.size();
+                temp =- 1;
+                max = miniStats.get(temp);
             }
         }
         else{

@@ -83,7 +83,7 @@ public class myOwnTest extends LinearOpMode {
         while (opModeIsActive()) {
 
             // --- DRIVE CONTROLS ---
-            //EDIT NO.4: turn is on left joystick and stafe is on right joystick
+            //EDIT NO.4: turn is on left joystick and strafe is on right joystick
             double y = -gamepad1.left_stick_y;
             double r = gamepad1.left_stick_x*0.2; //EDIT NO.2: x is meant to be strafing, and r is rotation
             double x = gamepad1.right_stick_x*1.1;
