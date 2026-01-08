@@ -1,37 +1,40 @@
 package org.firstinspires.ftc.teamcode;
 
-
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.Servo;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
-
-
-/**
- * December 2025
- * Valeria's code by the way, do not mess with please.
- * this code is so I can mess with it and don't alter MyTest, which actually works.
- * NEVER USE THIS FOR COMPETITIONS.
- */
-
 @TeleOp(name = "myOwnTest")
 public class myOwnTest extends LinearOpMode {
 
-    private CRServo SR1, SR2;
-    private DcMotorEx INT, LN;
+    // --- SERVOS ---
+    private CRServo SR1;   // Continuous rotation servo
+    private Servo SR2;     // Positional servo (0..180 deg)
+
+    // --- MOTORS ---
+    private DcMotorEx INTAKE;
+    private DcMotorEx LN, LN2;
     private DcMotor RL, RR, FL, FR;
 
     double servoPower = 0.0;
 
+    // --- SR2 (+75 / -75 degree control) ---
+    double sr2Pos = 0.5;                      // start at ~90°
+    final double SR2_STEP = 75.0 / 180.0;     // ≈ 0.4167
+    boolean ltWasPressed = false;
+    boolean rtWasPressed = false;
 
     @Override
     public void runOpMode() {
+
         // --- DRIVE MOTORS ---
         RL = hardwareMap.get(DcMotor.class, "RL");
         RR = hardwareMap.get(DcMotor.class, "RR");
@@ -41,39 +44,36 @@ public class myOwnTest extends LinearOpMode {
         FL.setDirection(DcMotor.Direction.REVERSE);
         RL.setDirection(DcMotor.Direction.REVERSE);
 
-        /*
-        EDIT NO.1: set the right wheels to forward explicitly so the directions are corrected
-         */
-        FR.setDirection(DcMotor.Direction.FORWARD);
-        RR.setDirection(DcMotor.Direction.FORWARD);
-
         RL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         RR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         FL.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         FR.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        // --- LAUNCHER MOTOR ---
+        // --- LAUNCHER MOTORS ---
         LN = hardwareMap.get(DcMotorEx.class, "LN");
+        LN2 = hardwareMap.get(DcMotorEx.class, "LN2");
+
         LN.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        LN2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         LN.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        LN2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         LN.setDirection(DcMotorSimple.Direction.FORWARD);
+        LN2.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        // --- INTAKE MOTOR ---
-        INT = hardwareMap.get(DcMotorEx.class, "INT");
-        INT.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        INT.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        INT.setDirection(DcMotorSimple.Direction.FORWARD);
+        // --- INTAKE ---
+        INTAKE = hardwareMap.get(DcMotorEx.class, "INTAKE");
+        INTAKE.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        INTAKE.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        INTAKE.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        // --- CR SERVOS ---
+        // --- SERVOS ---
         SR1 = hardwareMap.get(CRServo.class, "SR1");
-        SR2 = hardwareMap.get(CRServo.class, "SR2");
+        SR2 = hardwareMap.get(Servo.class, "SR2");
 
         SR1.setDirection(CRServo.Direction.FORWARD);
-        SR2.setDirection(CRServo.Direction.FORWARD);
-
-        // Neutral position
-        //SR1.setPower(0.5);
-        //SR2.setPower(0.5);
+        SR2.setPosition(sr2Pos);   // start at ~90°
 
         telemetry.addData("Status", "Ready");
         telemetry.update();
@@ -82,77 +82,60 @@ public class myOwnTest extends LinearOpMode {
 
         while (opModeIsActive()) {
 
-            // --- DRIVE CONTROLS ---
-            //EDIT NO.4: turn is on left joystick and strafe is on right joystick
+            // --- MECANUM DRIVE ---
             double y = -gamepad1.left_stick_y;
-            double r = gamepad1.left_stick_x*0.2; //EDIT NO.2: x is meant to be strafing, and r is rotation
-            double x = gamepad1.right_stick_x*1.1;
+            double x = gamepad1.left_stick_x;
+            double r = gamepad1.right_stick_x;
 
-            /*
-            EDIT NO.3: normalizes the power values by creating four new variables instead of
-            initiating the motors, which sets the power to stay under 1 by finding the maximum power
-            in all of the wheels and dividing the values by the max to set the power.
-             */
+            FL.setPower(y + x + r);
+            FR.setPower(y - x - r);
+            RL.setPower(y - x + r);
+            RR.setPower(y + x - r);
 
-            double fl = y + x + r;
-            double fr = y - x - r;
-            double rl = y - x + r;
-            double rr = y + x - r;
-
-            // Normalize so no value exceeds 1
-            double max = Math.max(1.0,
-                    Math.max(Math.abs(fl),
-                            Math.max(Math.abs(fr),
-                                    Math.max(Math.abs(rl), Math.abs(rr)))));
-
-            FL.setPower(fl / max);
-            FR.setPower(fr / max);
-            RL.setPower(rl / max);
-            RR.setPower(rr / max);
-
+            boolean rtPressed = gamepad1.right_trigger > 0.5;
+            boolean ltPressed = gamepad1.left_trigger > 0.5;
             // --- INTAKE ---
             double rpm = (6000.0 / 360.0) * 60.0;
             if (gamepad1.a) {
-                INT.setVelocity(rpm, AngleUnit.DEGREES);
-            } else {
-                INT.setPower(0);
-            }
-
-            // --- LAUNCHER ---
-            if (gamepad1.x) {
-                LN.setPower(0.7);
-            } else {
-                LN.setPower(0);
-            }
-
-            // --- CR SERVOS (manual control) ---
-            double forwardPower = 1.0;  // move forward
-            double stopPower = 0.0;     // neutral / stop
-
-            // --- CR SERVOS (manual control) ---
-            if (gamepad1.left_bumper) {
-                // Forward
-                servoPower = 1.0;
-                SR1.setPower(servoPower);
-                SR2.setPower(servoPower);
-            }
-            else if (gamepad1.right_bumper) {
-                // Reverse
-                servoPower = -1.0;
-                SR1.setPower(servoPower);
-                SR2.setPower(servoPower);
+                INTAKE.setVelocity(rpm, AngleUnit.DEGREES);
             }
             else {
-                // No bumper → stop
-                SR1.setPower(0.0);
-                SR2.setPower(0.0);
+                INTAKE.setPower(0);
             }
-            // Apply power
+            //------GATE------
+            if (ltPressed){
+                sr2Pos = Math.min(1.0, sr2Pos + SR2_STEP);
+            }
+            if (gamepad1.left_bumper){
+                sr2Pos = Math.max(0.0, sr2Pos - SR2_STEP);
+            }
+            // --- LAUNCHER ---
+            if (rtPressed) {
+                LN.setPower(0.7);
+                LN2.setPower(0.7);
+            } else {
+                LN.setPower(0);
+                LN2.setPower(0);
+            }
+
+            // --- SR1 (CR SERVO) ---
+            if (gamepad1.x) {
+                SR1.setPower(1.0);
+            } else if (gamepad1.b) {
+                SR1.setPower(-1.0);
+            } else {
+                SR1.setPower(0.0);
+            }
+
+            // --- SR2 (POSITION SERVO ±75°) ---
+            SR2.setPosition(sr2Pos);
 
 
-            // --- Telemetry ---
+
+            // --- TELEMETRY ---
             telemetry.addData("SR1 Power", SR1.getPower());
-            telemetry.addData("SR2 Power", SR2.getPower());
+            telemetry.addData("SR2 Position", sr2Pos);
+            telemetry.addData("SR2 Degrees", sr2Pos * 180.0);
             telemetry.update();
         }
     }

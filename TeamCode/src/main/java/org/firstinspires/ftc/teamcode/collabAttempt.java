@@ -72,7 +72,8 @@ public class collabAttempt extends OpMode {
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(56, 8, Math.toRadians(90)));
         paths = new Paths(follower);
-        SR2.setGatePosition(0.0); // Preset Gate Closed
+        sr2Pos = Math.min(1.0, sr2Pos + SR2_STEP);
+        SR2.setPosition(sr2Pos); // Preset Gate Closed
         setPathState(0);
 
         SR2 = hardwareMap.get(Servo.class, "SR2");
