@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.aprilTagPrograms;
 
+//limelight
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -8,6 +9,7 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.IMU;
 
+//lists
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Collections;
@@ -91,6 +93,10 @@ public class processor extends OpMode {
         else{
             telemetry.addLine("Nothing for now.");
         }
+
+    }
+
+    private void shoot(){
 
     }
 
