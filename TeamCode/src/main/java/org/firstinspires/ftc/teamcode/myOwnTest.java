@@ -73,7 +73,7 @@ public class myOwnTest extends LinearOpMode {
         SR2 = hardwareMap.get(Servo.class, "SR2");
 
         SR1.setDirection(CRServo.Direction.FORWARD);
-        SR2.setPosition(sr2Pos);   // start at ~90°
+        SR2.setPosition(sr2Pos);   // start at ~90° (aka open)
 
         telemetry.addData("Status", "Ready");
         telemetry.update();
@@ -92,27 +92,18 @@ public class myOwnTest extends LinearOpMode {
             RL.setPower(y - x + r);
             RR.setPower(y + x - r);
 
-            boolean rtPressed = gamepad1.right_trigger > 0.5;
-            boolean ltPressed = gamepad1.left_trigger > 0.5;
             // --- INTAKE ---
-            double rpm = (6000.0 / 360.0) * 60.0;
+            //double rpm = (6000.0 / 360.0) * 60.0;
             if (gamepad1.a) {
-                INTAKE.setVelocity(rpm, AngleUnit.DEGREES);
-            }
-            else {
+                INTAKE.setPower(0.7);
+            } else {
                 INTAKE.setPower(0);
             }
-            //------GATE------
-            if (ltPressed){
-                sr2Pos = Math.min(1.0, sr2Pos + SR2_STEP);
-            }
-            if (gamepad1.left_bumper){
-                sr2Pos = Math.max(0.0, sr2Pos - SR2_STEP);
-            }
+
             // --- LAUNCHER ---
-            if (rtPressed) {
-                LN.setPower(0.7);
-                LN2.setPower(0.7);
+            if (rtWasPressed) {
+                LN.setPower(0.52);
+                LN2.setPower(0.52);
             } else {
                 LN.setPower(0);
                 LN2.setPower(0);
@@ -128,8 +119,29 @@ public class myOwnTest extends LinearOpMode {
             }
 
             // --- SR2 (POSITION SERVO ±75°) ---
-            SR2.setPosition(sr2Pos);
+            boolean rtPressed = gamepad1.right_trigger > 0.5;
+            boolean ltPressed = gamepad2.right_trigger > 0.5;
 
+            if (!ltWasPressed) {
+                sr2Pos = Math.min(1.0, sr2Pos + SR2_STEP);
+            }
+
+            if (gamepad2.left_bumper) {
+                sr2Pos = Math.max(0.0, sr2Pos - SR2_STEP);
+            }
+
+            //--------JAM FIX-------------
+            //NOTE: This will ONLY change the direction.
+            if (ltPressed){
+                LN.setDirection(DcMotorSimple.Direction.FORWARD);
+            }
+            else{
+                LN.setDirection(DcMotorSimple.Direction.FORWARD);
+            }
+
+            ltWasPressed = ltPressed;
+            rtWasPressed = rtPressed;
+            SR2.setPosition(sr2Pos);
 
 
             // --- TELEMETRY ---
