@@ -30,6 +30,7 @@ public class processor extends OpMode {
     ArrayList<ArrayList<Double>> myStats = new ArrayList<>();
     ArrayList<Double> miniStats = new ArrayList<Double>();
 
+    //int [][] myData;
     @Override
     public void init() {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
@@ -97,7 +98,7 @@ public class processor extends OpMode {
             while (!miniStats.isEmpty()){
                 Collections.sort(miniStats);
                 min = miniStats.get(0);
-                temp = miniStats.size();
+                temp = myStats.size();
                 temp =- 1;
                 max = miniStats.get(temp);
             }
