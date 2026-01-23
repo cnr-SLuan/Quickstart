@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
-@TeleOp(name = "myOwnTest")
+@TeleOp(name = "MyTest")
 public class myOwnTest extends LinearOpMode {
 
     // --- SERVOS ---
@@ -31,6 +31,7 @@ public class myOwnTest extends LinearOpMode {
     final double SR2_STEP = 75.0 / 180.0;     // ≈ 0.4167
     boolean ltWasPressed = false;
     boolean rtWasPressed = false;
+    boolean rt2WasPressed = false;
 
     @Override
     public void runOpMode() {
@@ -102,12 +103,24 @@ public class myOwnTest extends LinearOpMode {
 
             // --- LAUNCHER ---
             if (rtWasPressed) {
-                LN.setPower(0.52);
-                LN2.setPower(0.52);
+                LN.setPower(0.55);
+                LN2.setPower(0.55);
             } else {
                 LN.setPower(0);
                 LN2.setPower(0);
             }
+            //--------JAM FIX-------------
+            //NOTE: This will ONLY change the direction.
+            boolean rt2Pressed = gamepad2.right_trigger > 0.5;
+            if (rt2Pressed){
+                LN.setDirection(DcMotorSimple.Direction.REVERSE);
+                LN2.setDirection(DcMotorSimple.Direction.FORWARD);
+            }
+            if (!rt2Pressed){
+                LN.setDirection(DcMotorSimple.Direction.FORWARD);
+                LN2.setDirection(DcMotorSimple.Direction.REVERSE);
+            }
+            rt2WasPressed = rt2Pressed;
 
             // --- SR1 (CR SERVO) ---
             if (gamepad1.x) {
@@ -120,23 +133,14 @@ public class myOwnTest extends LinearOpMode {
 
             // --- SR2 (POSITION SERVO ±75°) ---
             boolean rtPressed = gamepad1.right_trigger > 0.5;
-            boolean ltPressed = gamepad2.right_trigger > 0.5;
+            boolean ltPressed = gamepad2.left_trigger > 0.5;
 
-            if (!ltWasPressed) {
+            if (ltPressed) {
                 sr2Pos = Math.min(1.0, sr2Pos + SR2_STEP);
             }
 
             if (gamepad2.left_bumper) {
                 sr2Pos = Math.max(0.0, sr2Pos - SR2_STEP);
-            }
-
-            //--------JAM FIX-------------
-            //NOTE: This will ONLY change the direction.
-            if (ltPressed){
-                LN.setDirection(DcMotorSimple.Direction.FORWARD);
-            }
-            else{
-                LN.setDirection(DcMotorSimple.Direction.FORWARD);
             }
 
             ltWasPressed = ltPressed;
