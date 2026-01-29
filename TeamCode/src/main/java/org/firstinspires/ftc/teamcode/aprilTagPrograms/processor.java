@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 
 //lists
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Collections;
 
@@ -30,7 +31,7 @@ public class processor extends OpMode {
     ArrayList<ArrayList<Double>> myStats = new ArrayList<>();
     ArrayList<Double> miniStats = new ArrayList<Double>();
 
-    //int [][] myData;
+    int [][] myData;
     @Override
     public void init() {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");

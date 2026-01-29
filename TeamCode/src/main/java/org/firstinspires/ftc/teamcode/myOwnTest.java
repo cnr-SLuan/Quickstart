@@ -10,28 +10,24 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-
-@TeleOp(name = "MyTest")
+@TeleOp(name = "myOwnTest")
 public class myOwnTest extends LinearOpMode {
 
     // --- SERVOS ---
-    private CRServo SR1;   // Continuous rotation servo
+
     private Servo SR2;     // Positional servo (0..180 deg)
 
     // --- MOTORS ---
     private DcMotorEx INTAKE;
     private DcMotorEx LN, LN2;
     private DcMotor RL, RR, FL, FR;
-
-    double servoPower = 0.0;
-
+    private DcMotor SR;
     // --- SR2 (+75 / -75 degree control) ---
     double sr2Pos = 0.5;                      // start at ~90°
     final double SR2_STEP = 75.0 / 180.0;     // ≈ 0.4167
-    boolean ltWasPressed = false;
-    boolean rtWasPressed = false;
-    boolean rt2WasPressed = false;
+
+    // --- TURN SLOWDOWN (rotation only) ---
+    private static final double TURN_SCALE = 0.35; // 0.25 slower, 0.5 medium, 1.0 original
 
     @Override
     public void runOpMode() {
@@ -70,11 +66,12 @@ public class myOwnTest extends LinearOpMode {
         INTAKE.setDirection(DcMotorSimple.Direction.FORWARD);
 
         // --- SERVOS ---
-        SR1 = hardwareMap.get(CRServo.class, "SR1");
         SR2 = hardwareMap.get(Servo.class, "SR2");
+        SR = hardwareMap.get(DcMotor.class, "SR");
 
-        SR1.setDirection(CRServo.Direction.FORWARD);
-        SR2.setPosition(sr2Pos);   // start at ~90° (aka open)
+        SR.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        SR.setDirection(DcMotor.Direction.FORWARD);
+        SR2.setPosition(sr2Pos);   // start at ~90°
 
         telemetry.addData("Status", "Ready");
         telemetry.update();
@@ -86,54 +83,74 @@ public class myOwnTest extends LinearOpMode {
             // --- MECANUM DRIVE ---
             double y = -gamepad1.left_stick_y;
             double x = gamepad1.left_stick_x;
-            double r = gamepad1.right_stick_x;
 
-            FL.setPower(y + x + r);
-            FR.setPower(y - x - r);
-            RL.setPower(y - x + r);
-            RR.setPower(y + x - r);
+            // rotation scaled down ONLY (drive speed unchanged)
+            double r = gamepad1.right_stick_x * TURN_SCALE;
+
+            // (optional but recommended) normalize so powers stay within [-1, 1]
+            double fl = y + x + r;
+            double fr = y - x - r;
+            double rl = y - x + r;
+            double rr = y + x - r;
+
+            double max = Math.max(Math.abs(fl),
+                    Math.max(Math.abs(fr),
+                            Math.max(Math.abs(rl), Math.abs(rr))));
+
+            if (max > 1.0) {
+                fl /= max; fr /= max; rl /= max; rr /= max;
+            }
+
+            FL.setPower(fl);
+            FR.setPower(fr);
+            RL.setPower(rl);
+            RR.setPower(rr);
 
             // --- INTAKE ---
-            //double rpm = (6000.0 / 360.0) * 60.0;
             if (gamepad1.a) {
                 INTAKE.setPower(0.7);
             } else {
                 INTAKE.setPower(0);
             }
 
-            // --- LAUNCHER ---
-            if (rtWasPressed) {
-                LN.setPower(0.55);
-                LN2.setPower(0.55);
+            // -------- JAM FIX (reverse launcher direction) -------------
+            boolean jamFix = gamepad2.right_bumper;
+            if (jamFix) {
+                LN.setDirection(DcMotorSimple.Direction.REVERSE);
+                LN2.setDirection(DcMotorSimple.Direction.FORWARD);
+            } else {
+                LN.setDirection(DcMotorSimple.Direction.FORWARD);
+                LN2.setDirection(DcMotorSimple.Direction.REVERSE);
+            }
+
+            // --- LAUNCHER (two controllers) ---
+            boolean launchGp1 = gamepad1.right_trigger > 0.5; // main driver
+            boolean launchGp2 = gamepad2.right_trigger > 0.5; // second controller (R2)
+
+            if (launchGp2) {
+                LN.setPower(0.75);
+                LN2.setPower(0.75);
+            } else if (launchGp1) {
+                LN.setPower(0.65);
+                LN2.setPower(0.65);
             } else {
                 LN.setPower(0);
                 LN2.setPower(0);
             }
-            //--------JAM FIX-------------
-            //NOTE: This will ONLY change the direction.
-            boolean rt2Pressed = gamepad2.right_trigger > 0.5;
-            if (rt2Pressed){
-                LN.setDirection(DcMotorSimple.Direction.REVERSE);
-                LN2.setDirection(DcMotorSimple.Direction.FORWARD);
-            }
-            if (!rt2Pressed){
-                LN.setDirection(DcMotorSimple.Direction.FORWARD);
-                LN2.setDirection(DcMotorSimple.Direction.REVERSE);
-            }
-            rt2WasPressed = rt2Pressed;
 
-            // --- SR1 (CR SERVO) ---
+            // --- SR (JAM FIX MOTOR) ---
             if (gamepad1.x) {
-                SR1.setPower(1.0);
+                SR.setDirection(DcMotor.Direction.FORWARD);
+                SR.setPower(0.65);
             } else if (gamepad1.b) {
-                SR1.setPower(-1.0);
+                SR.setDirection(DcMotor.Direction.REVERSE);
+                SR.setPower(0.65);
             } else {
-                SR1.setPower(0.0);
+                SR.setPower(0.0);
             }
 
             // --- SR2 (POSITION SERVO ±75°) ---
-            boolean rtPressed = gamepad1.right_trigger > 0.5;
-            boolean ltPressed = gamepad2.left_trigger > 0.5;
+            boolean ltPressed = gamepad2.left_trigger > 0.5; // (note: also used for jamFix)
 
             if (ltPressed) {
                 sr2Pos = Math.min(1.0, sr2Pos + SR2_STEP);
@@ -143,13 +160,14 @@ public class myOwnTest extends LinearOpMode {
                 sr2Pos = Math.max(0.0, sr2Pos - SR2_STEP);
             }
 
-            ltWasPressed = ltPressed;
-            rtWasPressed = rtPressed;
             SR2.setPosition(sr2Pos);
 
-
             // --- TELEMETRY ---
-            telemetry.addData("SR1 Power", SR1.getPower());
+            telemetry.addData("Turn Scale", TURN_SCALE);
+            telemetry.addData("Launcher GP1", launchGp1);
+            telemetry.addData("Launcher GP2", launchGp2);
+            telemetry.addData("JamFix", jamFix);
+            telemetry.addData("SR1 Power", SR.getPower());
             telemetry.addData("SR2 Position", sr2Pos);
             telemetry.addData("SR2 Degrees", sr2Pos * 180.0);
             telemetry.update();
