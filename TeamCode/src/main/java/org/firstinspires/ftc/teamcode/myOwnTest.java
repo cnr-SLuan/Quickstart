@@ -25,9 +25,8 @@ public class myOwnTest extends LinearOpMode {
     // --- SR2 (+75 / -75 degree control) ---
     double sr2Pos = 0.5;                      // start at ~90°
     final double SR2_STEP = 75.0 / 180.0;     // ≈ 0.4167
-
     // --- TURN SLOWDOWN (rotation only) ---
-    private static final double TURN_SCALE = 0.35; // 0.25 slower, 0.5 medium, 1.0 original
+    private static double TURN_SCALE = 0.5; // 0.25 slower, 0.5 medium, 1.0 original
 
     @Override
     public void runOpMode() {
@@ -87,6 +86,16 @@ public class myOwnTest extends LinearOpMode {
             // rotation scaled down ONLY (drive speed unchanged)
             double r = gamepad1.right_stick_x * TURN_SCALE;
 
+            //------TURN SPEED------
+            //DO NOT HOLD DOWN FOR TOO LONG
+            if (gamepad1.dpadLeftWasPressed()){
+                TURN_SCALE = 0.15;
+            }
+            else if (gamepad1.dpadLeftWasReleased()){
+                TURN_SCALE = 0.5;
+            }
+
+
             // (optional but recommended) normalize so powers stay within [-1, 1]
             double fl = y + x + r;
             double fr = y - x - r;
@@ -113,6 +122,8 @@ public class myOwnTest extends LinearOpMode {
                 INTAKE.setPower(0);
             }
 
+
+
             // -------- JAM FIX (reverse launcher direction) -------------
             boolean jamFix = gamepad2.right_bumper;
             if (jamFix) {
@@ -128,8 +139,8 @@ public class myOwnTest extends LinearOpMode {
             boolean launchGp2 = gamepad2.right_trigger > 0.5; // second controller (R2)
 
             if (launchGp2) {
-                LN.setPower(0.75);
-                LN2.setPower(0.75);
+                LN.setPower(0.7);
+                LN2.setPower(0.7);
             } else if (launchGp1) {
                 LN.setPower(0.65);
                 LN2.setPower(0.65);
@@ -138,13 +149,13 @@ public class myOwnTest extends LinearOpMode {
                 LN2.setPower(0);
             }
 
-            // --- SR (JAM FIX MOTOR) ---
+            // ---- SR (JAM FIX MOTOR) ---
             if (gamepad1.x) {
                 SR.setDirection(DcMotor.Direction.FORWARD);
-                SR.setPower(0.65);
+                SR.setPower(1.0);
             } else if (gamepad1.b) {
                 SR.setDirection(DcMotor.Direction.REVERSE);
-                SR.setPower(0.65);
+                SR.setPower(1.0);
             } else {
                 SR.setPower(0.0);
             }
