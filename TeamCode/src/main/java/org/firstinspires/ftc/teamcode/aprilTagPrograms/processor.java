@@ -28,8 +28,7 @@ public class processor extends OpMode {
     double max;
     int temp;
 
-    ArrayList<ArrayList<Double>> myStats = new ArrayList<>();
-    ArrayList<Double> miniStats = new ArrayList<Double>();
+        ArrayList<Double> myStats = new ArrayList<Double>();
 
     int [][] myData;
     @Override
@@ -64,19 +63,28 @@ public class processor extends OpMode {
                 for (LLResultTypes.FiducialResult tag : fiducials) {
                     telemetry.addData("Distance", tag.getCameraPoseTargetSpace());//tells the space based on the april tag
                     telemetry.addData("Tag ID", tag.getFiducialId());
+                    int e = 0;
+                    while (e < 50){
+                        myStats.add(llResult.getBotposeAvgDist());
+                        e ++;
+                    }
+                    while (!myStats.isEmpty()){
+                        Collections.sort(myStats);
+                        min = myStats.get(0);
+                        temp = myStats.size();
+                        max = myStats.get(temp - 1);//gets the final element in the list
+                    }
                     if (tag.getFiducialId() == 22){
                         telemetry.addData("Current Team", "Blue");
-                        for (int i = 0; i < temp; i++){
-                            if (miniStats.get(i) == tag.getFiducialId()){
-                                i = temp;
+                        for (double i: myStats){
+                            if (min <= llResult.getBotposeAvgDist() && llResult.getBotposeAvgDist() <= max){
                                 telemetry.addData("Shooting Status: ", "Safe to shoot");
                             }
                             else{
                                 telemetry.addData("Shooting Status: ", "Not safe to shoot");
-                                i++;
                             }
 
-                        }
+                        }telemetry.update();
                     }
                     if (tag.getFiducialId() == 21){
                         telemetry.addData("Current Team", "Red");
@@ -91,22 +99,7 @@ public class processor extends OpMode {
         }
     }
     private void redTeam(){
-        if (gamepad1.dpadUpWasPressed()){
-            miniStats.add(llResult.getTx());
-            miniStats.add(llResult.getTy());
-            miniStats.add(llResult.getTa());
-            myStats.add(miniStats);
-            while (!miniStats.isEmpty()){
-                Collections.sort(miniStats);
-                min = miniStats.get(0);
-                temp = myStats.size();
-                temp =- 1;
-                max = miniStats.get(temp);
-            }
-        }
-        else{
-            telemetry.addLine("Nothing for now.");
-        }
+
 
     }
 
