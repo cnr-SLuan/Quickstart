@@ -23,14 +23,14 @@ public class myOwnTest extends LinearOpMode {
     private DcMotor RL, RR, FL, FR;
     private DcMotor SR;
     // --- SR2 (+75 / -75 degree control) ---
-    double sr2Pos = 0.5;                      // start at ~90°
+
     final double SR2_STEP = 75.0 / 180.0;     // ≈ 0.4167
     // --- TURN SLOWDOWN (rotation only) ---
     private static double TURN_SCALE = 0.5; // 0.25 slower, 0.5 medium, 1.0 original
 
     @Override
     public void runOpMode() {
-
+        double sr2Pos = 0.0;    // start at ~0°
         // --- DRIVE MOTORS ---
         RL = hardwareMap.get(DcMotor.class, "RL");
         RR = hardwareMap.get(DcMotor.class, "RR");
