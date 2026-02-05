@@ -122,6 +122,15 @@ public class myOwnTest extends LinearOpMode {
                 INTAKE.setPower(0);
             }
 
+            //------------ INTAKE JAM FIX -------------------
+            if (gamepad1.yWasPressed()){
+                INTAKE.setDirection(DcMotorSimple.Direction.REVERSE);
+                INTAKE.setPower(0.7);
+            }
+            if (gamepad1.yWasReleased()){
+                INTAKE.setDirection(DcMotorSimple.Direction.FORWARD);
+            }
+
 
 
             // -------- JAM FIX (reverse launcher direction) -------------
