@@ -123,11 +123,11 @@ public class myOwnTest extends LinearOpMode {
             }
 
             //------------ INTAKE JAM FIX -------------------
-            if (gamepad1.yWasPressed()){
+            if (gamepad1.left_bumper){
                 INTAKE.setDirection(DcMotorSimple.Direction.REVERSE);
                 INTAKE.setPower(0.7);
             }
-            if (gamepad1.yWasReleased()){
+            else {
                 INTAKE.setDirection(DcMotorSimple.Direction.FORWARD);
             }
 
@@ -146,6 +146,7 @@ public class myOwnTest extends LinearOpMode {
             // --- LAUNCHER (two controllers) ---
             boolean launchGp1 = gamepad1.right_trigger > 0.5; // main driver
             boolean launchGp2 = gamepad2.right_trigger > 0.5; // second controller (R2)
+            boolean Gp3 = gamepad1.left_trigger  > 0.5; //first controller
 
             if (launchGp2) {
                 LN.setPower(0.7);
@@ -162,7 +163,7 @@ public class myOwnTest extends LinearOpMode {
             if (gamepad1.x) {
                 SR.setDirection(DcMotor.Direction.FORWARD);
                 SR.setPower(1.0);
-            } else if (gamepad1.b) {
+            } else if (Gp3) {
                 SR.setDirection(DcMotor.Direction.REVERSE);
                 SR.setPower(1.0);
             } else {
