@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -160,10 +159,10 @@ public class myOwnTest extends LinearOpMode {
             }
 
             // ---- SR (JAM FIX MOTOR) ---
-            if (gamepad1.x) {
+            if (Gp3) {
                 SR.setDirection(DcMotor.Direction.FORWARD);
                 SR.setPower(1.0);
-            } else if (Gp3) {
+            } else if (gamepad1.b) {
                 SR.setDirection(DcMotor.Direction.REVERSE);
                 SR.setPower(1.0);
             } else {
