@@ -153,8 +153,6 @@ public class mergeAttempt extends LinearOpMode{
                 INTAKE.setDirection(DcMotorSimple.Direction.FORWARD);
             }
 
-
-
             // -------- JAM FIX (reverse launcher direction) -------------
             boolean jamFix = gamepad2.right_bumper;
             if (jamFix) {
