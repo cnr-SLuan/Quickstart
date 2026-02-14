@@ -3,17 +3,32 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+///------------MOTOR CONFIGS-------------
 import com.qualcomm.robotcore.hardware.Servo;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import java.nio.channels.FileLock;
+///-----------APRIL TAG CONFIGS----------
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import com.qualcomm.hardware.limelightvision.LLStatus;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.IMU;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
-@TeleOp(name = "myOwnTest")
-public class myOwnTest extends LinearOpMode {
+import java.util.List;
 
+@TeleOp(name = "mergeAttempt")
+public class mergeAttempt extends LinearOpMode{
+    private Limelight3A webcam1;
+    private IMU imu;
+
+    //MECHANICS
     // --- SERVOS ---
 
     private Servo SR2;     // Positional servo (0..180 deg)
@@ -22,31 +37,14 @@ public class myOwnTest extends LinearOpMode {
     private DcMotorEx INTAKE;
     private DcMotorEx LN, LN2;
     private DcMotor RL, RR, FL, FR;
-    //-------CONFIGS FOR CONTROLLER--------
-    //-----CONTROL HUB-----
-    //---MOTORS---
-    //0 - FL
-    //1 - FR
-    //2 - RL
-    //3 - RR
-    //-----EXPANSION HUB-----
-    //---SERVOS---
-    //0 - SR2
-    //---MOTORS---
-    //0 - INTAKE
-    //1 - GOBILDA 6000 - LN
-    //2 - GOBILDA 6000 - LN2
-    //3 - REV HEXCORE - SR
-
     private DcMotor SR;
     // --- SR2 (+75 / -75 degree control) ---
 
     final double SR2_STEP = 75.0 / 180.0;     // ≈ 0.4167
     // --- TURN SLOWDOWN (rotation only) ---
     private static double TURN_SCALE = 0.5; // 0.25 slower, 0.5 medium, 1.0 original
-
     @Override
-    public void runOpMode() {
+    public void runOpMode(){
         double sr2Pos = 0.0;    // start at ~0°
         // --- DRIVE MOTORS ---
         RL = hardwareMap.get(DcMotor.class, "RL");
@@ -92,10 +90,17 @@ public class myOwnTest extends LinearOpMode {
         telemetry.addData("Status", "Ready");
         telemetry.update();
 
+        //LIMELIGHT INIT (help)
+        webcam1 = hardwareMap.get(Limelight3A.class, "webcam1");
+        webcam1.pipelineSwitch(8);
+        imu = hardwareMap.get(IMU.class, "imu");
+        RevHubOrientationOnRobot revHubOrientationOnRobot = new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.UP,
+                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD);
+        imu.initialize(new IMU.Parameters(revHubOrientationOnRobot));
+
         waitForStart();
-
         while (opModeIsActive()) {
-
+            webcam1.start();
             // --- MECANUM DRIVE ---
             double y = -gamepad1.left_stick_y;
             double x = gamepad1.left_stick_x;
@@ -209,6 +214,38 @@ public class myOwnTest extends LinearOpMode {
             telemetry.addData("SR2 Position", sr2Pos);
             telemetry.addData("SR2 Degrees", sr2Pos * 180.0);
             telemetry.update();
+
+            //PROCESSOR
+            YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
+            webcam1.updateRobotOrientation(orientation.getYaw());
+            LLResult llResult = webcam1.getLatestResult();
+            if (llResult != null && llResult.isValid()) {
+                Pose3D botPose = llResult.getBotpose_MT2();
+                telemetry.addData("Tx", llResult.getTx());
+                telemetry.addData("Ty", llResult.getTy());
+                telemetry.addData("Ta", llResult.getTa());
+                telemetry.addData("Distance", llResult.getBotposeAvgDist());
+                List<LLResultTypes.FiducialResult> fiducials = llResult.getFiducialResults();
+                if (fiducials.isEmpty()) {
+                    telemetry.addLine("No AprilTags");
+                } else {
+                    for (LLResultTypes.FiducialResult tag : fiducials) {
+                        telemetry.addData("Distance", tag.getCameraPoseTargetSpace());//tells the space based on the april tag
+                        telemetry.addData("Tag ID", tag.getFiducialId());
+                        if (tag.getFiducialId() == 22){
+                            telemetry.addData("Current Team", "Blue");
+                        }
+                        if (tag.getFiducialId() == 21){
+                            telemetry.addData("Current Team", "Red");
+                        }
+                        else{
+                            telemetry.addLine("Direct april tag not found.");
+                        }
+                        fiducials.clear();
+                    }
+                }
+
+            }
         }
     }
 }
