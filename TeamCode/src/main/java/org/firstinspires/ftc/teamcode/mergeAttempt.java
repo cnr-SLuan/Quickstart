@@ -228,7 +228,7 @@ public class mergeAttempt extends LinearOpMode{
                     telemetry.addLine("No AprilTags");
                 } else {
                     for (LLResultTypes.FiducialResult tag : fiducials) {
-                        telemetry.addData("Distance", tag.getCameraPoseTargetSpace());//tells the space based on the april tag
+                        telemetry.addData("Target Space", tag.getCameraPoseTargetSpace());//tells the space based on the april tag
                         telemetry.addData("Tag ID", tag.getFiducialId());
                         if (tag.getFiducialId() == 22){
                             telemetry.addData("Current Team", "Blue");
