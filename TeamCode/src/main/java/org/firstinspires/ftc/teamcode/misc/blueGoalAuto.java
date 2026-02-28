@@ -1,12 +1,12 @@
-package org.firstinspires.ftc.teamcode.autoTests;
+package org.firstinspires.ftc.teamcode.misc;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@TeleOp(name = "twelveArtsTest (Blocks to Java)")
-public class twelveArtsTest extends LinearOpMode {
+@TeleOp(name = "blueGoalAuto (Blocks to Java)")
+public class blueGoalAuto extends LinearOpMode {
 
     private DcMotor INTAKE;
     private Servo SR2;
@@ -40,13 +40,13 @@ public class twelveArtsTest extends LinearOpMode {
      * Describe this function...
      */
     private void redGoal() {
+        LN.setPower(0.58);
+        LN2.setPower(0.58);
         reverse();
         sleep(1400);
         stop2();
-        LN.setPower(0.54);
-        LN2.setPower(0.54);
         shoot();
-        fetchArt1();
+        leaveWhiteLine();
     }
 
     /**
@@ -148,23 +148,6 @@ public class twelveArtsTest extends LinearOpMode {
         RL.setPower(-0.5);
         FR.setPower(-0.5);
         RR.setPower(-0.5);
-    }
-
-    /**
-     * Describe this function...
-     */
-    private void fetchArt1() {
-        left();
-        sleep(250);
-        forward();
-        sleep(400);
-        right();
-        sleep(150);
-        forward();
-        sleep(450);
-        reverse();
-        sleep(800);
-        stop2();
     }
 
     /**
