@@ -18,7 +18,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 @TeleOp(name = "processor")
-public class processor extends OpMode {
+public class processorHolder extends OpMode {
     private Limelight3A limelight;
     private IMU imu;
     LLResult llResult;
