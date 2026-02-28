@@ -1,25 +1,36 @@
 package org.firstinspires.ftc.teamcode.aprilTagPrograms;
 
+//limelight
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
-import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.IMU;
 
+//lists
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Collections;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
-@TeleOp(name = "processorHolder")
-public class processorHolder extends OpMode {
+@TeleOp(name = "processor")
+public class processor extends OpMode {
     private Limelight3A limelight;
     private IMU imu;
-    private LLResultTypes.BarcodeResult BarcodeResult;
+    LLResult llResult;
 
+    double min;
+    double max;
+    int temp;
+    ArrayList<Integer> myIds = new ArrayList<Integer>();
+
+    ArrayList<Double> myStats = new ArrayList<Double>();
+
+    int [][] myData;
     @Override
     public void init() {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
@@ -39,13 +50,14 @@ public class processorHolder extends OpMode {
     public void loop() {
         YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
         limelight.updateRobotOrientation(orientation.getYaw());
-        LLResult llResult = limelight.getLatestResult();
+        llResult = limelight.getLatestResult();
+        myIds.add(22);
+        myIds.add(21);
         if (llResult != null && llResult.isValid()) {
             Pose3D botPose = llResult.getBotpose_MT2();
             telemetry.addData("Tx", llResult.getTx());
             telemetry.addData("Ty", llResult.getTy());
             telemetry.addData("Ta", llResult.getTa());
-            telemetry.addData("Distance", llResult.getBotposeAvgDist());
             List<LLResultTypes.FiducialResult> fiducials = llResult.getFiducialResults();
             if (fiducials.isEmpty()) {
                 telemetry.addLine("No AprilTags");
@@ -53,11 +65,41 @@ public class processorHolder extends OpMode {
                 for (LLResultTypes.FiducialResult tag : fiducials) {
                     telemetry.addData("Distance", tag.getCameraPoseTargetSpace());//tells the space based on the april tag
                     telemetry.addData("Tag ID", tag.getFiducialId());
-                    if (tag.getFiducialId() == 22){
-                        telemetry.addData("Current Team", "Blue");
+                    int e = 0;
+                    while (e < 50){
+                        myStats.add(llResult.getBotposeAvgDist());
+                        e ++;
                     }
-                    if (tag.getFiducialId() == 21){
+                    while (!myStats.isEmpty()){
+                        Collections.sort(myStats);
+                        min = myStats.get(0);
+                        temp = myStats.size();
+                        max = myStats.get(temp - 1);//gets the final element in the list
+                    }
+                    if (tag.getFiducialId() == myIds.get(0)){
+                        telemetry.addData("Current Team", "Blue"); //catches the team its in to make sure to shoot for only that apriltag
+                        for (double i: myStats){
+                            if (min <= llResult.getBotposeAvgDist() && llResult.getBotposeAvgDist() <= max){
+                                telemetry.addData("Shooting Status: ", "Safe to shoot");
+                            }
+                            else{
+                                telemetry.addData("Shooting Status: ", "Not safe to shoot");
+                            }
+
+                        }telemetry.update();
+                    }
+                    if (tag.getFiducialId() == myIds.get(1)){
+
                         telemetry.addData("Current Team", "Red");
+                        for (double i: myStats){
+                            if (min <= llResult.getBotposeAvgDist() && llResult.getBotposeAvgDist() <= max){
+                                telemetry.addData("Shooting Status: ", "Safe to shoot");
+                            }
+                            else{
+                                telemetry.addData("Shooting Status: ", "Not safe to shoot");
+                            }
+
+                        }telemetry.update();
                     }
                     else{
                         telemetry.addLine("Direct april tag not found.");
@@ -67,6 +109,14 @@ public class processorHolder extends OpMode {
             }
 
         }
+    }
+    private void redTeam(){
+
+
+    }
+
+    private void shoot(){
+
     }
 
 }
