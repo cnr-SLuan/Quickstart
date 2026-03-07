@@ -204,6 +204,7 @@ public class mergeAttempt extends LinearOpMode{
             SR2.setPosition(sr2Pos);
 
             // --- TELEMETRY ---
+            /*
             telemetry.addData("Turn Scale", TURN_SCALE);
             telemetry.addData("Launcher GP1", launchGp1);
             telemetry.addData("Launcher GP2", launchGp2);
@@ -212,6 +213,7 @@ public class mergeAttempt extends LinearOpMode{
             telemetry.addData("SR2 Position", sr2Pos);
             telemetry.addData("SR2 Degrees", sr2Pos * 180.0);
             telemetry.update();
+             */
 
             //PROCESSOR
             YawPitchRollAngles orientation = imu.getRobotYawPitchRollAngles();
@@ -219,31 +221,68 @@ public class mergeAttempt extends LinearOpMode{
             LLResult llResult = webcam1.getLatestResult();
             if (llResult != null && llResult.isValid()) {
                 Pose3D botPose = llResult.getBotpose_MT2();
-                telemetry.addData("Tx", llResult.getTx());
-                telemetry.addData("Ty", llResult.getTy());
-                telemetry.addData("Ta", llResult.getTa());
+                telemetry.addData("Tx", llResult.getTx()); //minimum tx is -22.75; max is 23.35
+                //range: 2.0-2.0
+                telemetry.addData("Ty", llResult.getTy());// max is 13.4; min is 4.7 (lowest i could possibly make it)
+                //range: 7.2-5.2
+                telemetry.addData("Ta", llResult.getTa());// max is 8.64; min is 0.63
                 telemetry.addData("Distance", llResult.getBotposeAvgDist());
+                //range: 3.0-4.0
                 List<LLResultTypes.FiducialResult> fiducials = llResult.getFiducialResults();
                 if (fiducials.isEmpty()) {
                     telemetry.addLine("No AprilTags");
-                } else {
+                }
+                else {
                     for (LLResultTypes.FiducialResult tag : fiducials) {
                         telemetry.addData("Target Space", tag.getCameraPoseTargetSpace());//tells the space based on the april tag
                         telemetry.addData("Tag ID", tag.getFiducialId());
-                        if (tag.getFiducialId() == 22){
-                            telemetry.addData("Current Team", "Blue");
+                        if ((llResult.getTx() >= -10.0 && llResult.getTx() <= 10.0) && (llResult.getTy() <= 8.0 && llResult.getTy() >= 5.2) && (llResult.getTa() >= 0.0 && llResult.getTa() <= 4.0)) {
+                            telemetry.addData("Shooting Status", "Safe to shoot");
+                        } else {
+                            telemetry.addData("Shooting Status", "Not safe to shoot");
                         }
-                        if (tag.getFiducialId() == 21){
-                            telemetry.addData("Current Team", "Red");
-                        }
-                        else{
-                            telemetry.addLine("Direct april tag not found.");
+                        if (gamepad1.yWasPressed()) {
+                            while (!(llResult.getTx() >= -10.0 && llResult.getTx() <= 10.0) && !(llResult.getTy() <= 8.0 && llResult.getTy() >= 5.2) && !(llResult.getTa() >= 0.0 && llResult.getTa() <= 4.0)) {
+                                //holder
+                                
+                            }
                         }
                         fiducials.clear();
                     }
                 }
-
             }
         }
+    }
+    private void reverse() {
+        FL.setPower(-0.5);
+        RL.setPower(-0.5);
+        FR.setPower(-0.5);
+        RR.setPower(-0.5);
+    }
+    private void forward() {
+        FL.setPower(0.5);
+        RL.setPower(0.5);
+        FR.setPower(0.5);
+        RR.setPower(0.5);
+    }
+
+    private void right() {
+        FL.setPower(0.5);
+        RL.setPower(0.5);
+        FR.setPower(-0.5);
+        RR.setPower(-0.5);
+    }
+
+    private void left() {
+        FL.setPower(-0.5);
+        RL.setPower(-0.5);
+        FR.setPower(0.5);
+        RR.setPower(0.5);
+    }
+    private void robotStop(){
+        FL.setPower(0.0);
+        RL.setPower(0.0);
+        FR.setPower(0.0);
+        RR.setPower(0.0);
     }
 }
