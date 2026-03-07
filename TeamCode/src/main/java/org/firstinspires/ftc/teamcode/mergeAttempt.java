@@ -242,9 +242,11 @@ public class mergeAttempt extends LinearOpMode{
                             telemetry.addData("Shooting Status", "Not safe to shoot");
                         }
                         if (gamepad1.yWasPressed()) {
-                            while (!(llResult.getTx() >= -10.0 && llResult.getTx() <= 10.0) && !(llResult.getTy() <= 8.0 && llResult.getTy() >= 5.2) && !(llResult.getTa() >= 0.0 && llResult.getTa() <= 4.0)) {
-                                //holder
-                                
+                            while (!(llResult.getTx() >= -10.0 && llResult.getTx() <= 10.0)) {
+                                left();
+                                sleep(50);
+                                right();
+                                sleep(50);
                             }
                         }
                         fiducials.clear();
