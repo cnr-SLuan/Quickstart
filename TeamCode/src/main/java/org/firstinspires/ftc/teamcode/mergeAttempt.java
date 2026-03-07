@@ -41,6 +41,7 @@ public class mergeAttempt extends LinearOpMode{
     // --- SR2 (+75 / -75 degree control) ---
 
     final double SR2_STEP = 75.0 / 180.0;     // ≈ 0.4167
+    private double turnSpeed;
     // --- TURN SLOWDOWN (rotation only) ---
     private static double TURN_SCALE = 0.5; // 0.25 slower, 0.5 medium, 1.0 original
     @Override
@@ -242,12 +243,10 @@ public class mergeAttempt extends LinearOpMode{
                             telemetry.addData("Shooting Status", "Not safe to shoot");
                         }
                         if (gamepad1.yWasPressed()) {
-                            while (!(llResult.getTx() >= -10.0 && llResult.getTx() <= 10.0)) {
-                                left();
-                                sleep(50);
-                                right();
-                                sleep(50);
-                            }
+                            TURN_SCALE = 0.5 * llResult.getTx();
+                        }
+                        if (gamepad1.yWasReleased()){
+                            TURN_SCALE = 0.5;
                         }
                         fiducials.clear();
                     }
