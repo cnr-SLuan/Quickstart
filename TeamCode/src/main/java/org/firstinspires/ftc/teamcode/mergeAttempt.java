@@ -39,7 +39,6 @@ public class mergeAttempt extends LinearOpMode{
     private DcMotor RL, RR, FL, FR;
     private DcMotor SR;
     // --- SR2 (+75 / -75 degree control) ---
-
     final double SR2_STEP = 75.0 / 180.0;     // ≈ 0.4167
     private double turnSpeed;
     // --- TURN SLOWDOWN (rotation only) ---
@@ -248,11 +247,36 @@ public class mergeAttempt extends LinearOpMode{
                         if (gamepad1.yWasReleased()){
                             TURN_SCALE = 0.5;
                         }
+                        //------------SELF FIX---------------
+                        if (gamepad1.xWasPressed()){
+                            if ((llResult.getTx() <= -10.0)){
+                                left();
+                                sleep(500);
+                                stop();
+                            }
+                            if ((llResult.getTx() >= 10.0)){
+                                right();
+                                sleep(500);
+                                stop();
+                            }
+                            if ((llResult.getTy() <= 5.2)){
+                                reverse();
+                                sleep(500);
+                                stop();
+                            }
+                            if(llResult.getTy() >= 8.0){
+                                forward();
+                                sleep(500);
+                                stop();
+                            }
+                        }
                         fiducials.clear();
                     }
                 }
             }
         }
+        //----------------FIX SHOOTING-----------------
+
     }
     private void reverse() {
         FL.setPower(-0.5);
