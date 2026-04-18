@@ -238,17 +238,21 @@ public class mergeAttempt extends LinearOpMode{
                         telemetry.addData("Tag ID", tag.getFiducialId());
                         if ((llResult.getTx() >= -10.0 && llResult.getTx() <= 10.0) && (llResult.getTy() <= 8.0 && llResult.getTy() >= 5.2) && (llResult.getTa() >= 0.0 && llResult.getTa() <= 4.0)) {
                             telemetry.addData("Shooting Status", "Safe to shoot");
-                        } else {
+                        }
+                        else {
+                            if (!(llResult.getTx() >= -10.0 || llResult.getTx() <= 10.0) || !(llResult.getTy() <= 8.0 && llResult.getTy() >= 5.2) || !(llResult.getTa() >= 0.0 && llResult.getTa() <= 4.0)){
+
+                            }
                             telemetry.addData("Shooting Status", "Not safe to shoot");
                         }
-                        if (gamepad1.yWasPressed()) {
+                        /*if (gamepad1.yWasPressed()) {
                             TURN_SCALE = 0.5 * llResult.getTx();
                         }
                         if (gamepad1.yWasReleased()){
                             TURN_SCALE = 0.5;
-                        }
+                        }*/
                         //------------SELF FIX---------------
-                        /*if (gamepad1.xWasPressed()){
+                        if (gamepad1.xWasPressed()){
                             if ((llResult.getTx() <= -10.0)){
                                 left();
                                 sleep(500);
@@ -270,13 +274,12 @@ public class mergeAttempt extends LinearOpMode{
                                 stop();
                             }
                         }
-                         */
+
                         fiducials.clear();
                     }
                 }
             }
         }
-        //----------------FIX SHOOTING-----------------
 
     }
     private void reverse() {
