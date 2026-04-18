@@ -248,7 +248,7 @@ public class mergeAttempt extends LinearOpMode{
                             TURN_SCALE = 0.5;
                         }
                         //------------SELF FIX---------------
-                        if (gamepad1.xWasPressed()){
+                        /*if (gamepad1.xWasPressed()){
                             if ((llResult.getTx() <= -10.0)){
                                 left();
                                 sleep(500);
@@ -270,6 +270,7 @@ public class mergeAttempt extends LinearOpMode{
                                 stop();
                             }
                         }
+                         */
                         fiducials.clear();
                     }
                 }
