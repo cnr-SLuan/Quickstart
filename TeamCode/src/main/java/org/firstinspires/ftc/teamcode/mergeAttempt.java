@@ -105,7 +105,7 @@ public class mergeAttempt extends LinearOpMode{
             double y = -gamepad1.left_stick_y;
             double x = gamepad1.left_stick_x;
 
-            // rotation scaled down ONLY (drive speed unchanged)
+            // rotation scaled down ONLY (drive speed unchanged)+
             double r = gamepad1.right_stick_x * TURN_SCALE;
 
             //------TURN SPEED------
@@ -239,19 +239,23 @@ public class mergeAttempt extends LinearOpMode{
                         if ((llResult.getTx() >= -10.0 && llResult.getTx() <= 10.0) && (llResult.getTy() <= 8.0 && llResult.getTy() >= 5.2) && (llResult.getTa() >= 0.0 && llResult.getTa() <= 4.0)) {
                             telemetry.addData("Shooting Status", "Safe to shoot");
                         }
-                        else {
-                            if (!(llResult.getTx() >= -10.0 || llResult.getTx() <= 10.0) || !(llResult.getTy() <= 8.0 && llResult.getTy() >= 5.2) || !(llResult.getTa() >= 0.0 && llResult.getTa() <= 4.0)){
+                        else{
+                            telemetry.addData("Shooting Status", "Not safe to shoot");
 
-                            }
                             telemetry.addData("Shooting Status", "Not safe to shoot");
                         }
+
+
                         /*if (gamepad1.yWasPressed()) {
                             TURN_SCALE = 0.5 * llResult.getTx();
                         }
-                        if (gamepad1.yWasReleased()){
+                        else if (gamepad1.yWasReleased()){
                             TURN_SCALE = 0.5;
-                        }*/
+                        }
+
+                         */
                         //------------SELF FIX---------------
+                        /*
                         if (gamepad1.xWasPressed()){
                             if ((llResult.getTx() <= -10.0)){
                                 left();
@@ -275,6 +279,7 @@ public class mergeAttempt extends LinearOpMode{
                             }
                         }
 
+                         */
                         fiducials.clear();
                     }
                 }
